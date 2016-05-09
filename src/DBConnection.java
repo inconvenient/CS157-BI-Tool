@@ -4,7 +4,7 @@ public class DBConnection {
 
 	String url = "jdbc:mysql://localhost:3306/starschema"; // CHANGE THIS!
 	String userid = "root"; // CHANGE THIS!
-	String password = "psoe12source"; // CHANGE THIS!
+	String password = ""; // CHANGE THIS!
 
 	public DBConnection() {
 
