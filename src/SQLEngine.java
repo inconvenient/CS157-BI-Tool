@@ -60,4 +60,10 @@ public class SQLEngine {
 		return rs;
 	}
 
+	public ResultSet executeQuery(String sql) throws SQLException {
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery(sql);
+		return rs;
+	}
+
 }
