@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -15,14 +17,26 @@ public class GUI {
 
 	// GUI Variables
 	private JFrame mainFrame;
+
 	private JPanel leftPanel;
 	private JPanel cubePanel;
+	private JPanel centerPanel;
+
+	private JTextField userEntry;
+
 	private JList dimensionList;
 	private JList attrList;
+	private JList selectList;
+
+	private JButton selectBtn;
+	private JButton removeBtn;
+	private JButton goBtn;
+
 	private JTable cube;
 
 	// Data Variables
 	private ArrayList<String> attributes;
+	private ArrayList<String> selections;
 
 	public static void main(String[] args) throws SQLException {
 		sqlEngine = new SQLEngine();
@@ -40,12 +54,12 @@ public class GUI {
 
 		// MAIN WINDOW *************************
 		mainFrame = new JFrame("Avalanche BI Tool");
-		mainFrame.setSize(1280, 960);
+		mainFrame.setSize(1600, 900);
 		mainFrame.setLayout(new BorderLayout());
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// LEFT PANEL *************************
-		leftPanel = new JPanel(new GridLayout(3, 1));
+		leftPanel = new JPanel(new GridLayout(4, 1));
 
 		// JLIST DIMENSION
 		dimensionList = new JList(sqlEngine.populateDimensions().toArray());
@@ -75,13 +89,63 @@ public class GUI {
 		}
 		JScrollPane attrPane = new JScrollPane(attrList);
 
+		// User entry area for custom input
+		userEntry = new JTextField();
+
+		// Add selection to list
+		DefaultListModel<String> selectModel = new DefaultListModel<String>();
+		selectBtn = new JButton("Add attribute");
+		selectBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				selections = new ArrayList<String>();
+				selections.add(
+						dimensionList.getSelectedValue().toString() + "." + attrList.getSelectedValue().toString());
+				if (selectList != null) {
+					for (String s : selections) {
+						selectModel.addElement(s);
+					}
+				}
+			}
+		});
+		// Remove selection from list
+		removeBtn = new JButton("Clear selected list");
+		removeBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				selections.clear();
+				selectModel.removeAllElements();
+			}
+		});
+		// GO BUTTON!
+		goBtn = new JButton("Execute query");
+		goBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		});
+
 		// CONFIG LEFT PANEL
 		leftPanel.add(dimPane);
 		leftPanel.add(attrPane);
+		leftPanel.add(userEntry);
+
+		// CENTER PANEL
+		centerPanel = new JPanel(new GridLayout(4, 1));
+		selectList = new JList(selectModel);
+		JScrollPane selectionPane = new JScrollPane(selectList);
+		centerPanel.add(selectionPane);
+		centerPanel.add(selectBtn);
+		centerPanel.add(removeBtn);
+		centerPanel.add(goBtn);
 
 		// CUBE PANEL *************************
 		cubePanel = new JPanel();
-		JTable cube = new JTable();
+		cube = new JTable();
 
 		// Populate Cube
 		ArrayList columnNames = new ArrayList();
@@ -137,16 +201,11 @@ public class GUI {
 		JScrollPane cubePane = new JScrollPane(cube);
 		cubePanel.add(cubePane);
 
-		// ADD TO MAINFRAME
+		// MAIN FRAME *************************
 		mainFrame.add(leftPanel, BorderLayout.WEST);
 		mainFrame.add(cubePanel, BorderLayout.EAST);
+		mainFrame.add(centerPanel, BorderLayout.CENTER);
 
 		mainFrame.setVisible(true);
 	}
-
-	public void populateDimensions() {
-		ArrayList columnNames = new ArrayList();
-
-	}
-
 }
