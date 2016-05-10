@@ -31,6 +31,7 @@ public class GUI {
 
 	private JButton selectBtn;
 	private JButton removeBtn;
+	private JButton clearBtn;
 	private JButton goBtn;
 
 	private JTable cube;
@@ -38,6 +39,7 @@ public class GUI {
 
 	// Data Variables
 	private ArrayList<String> attributes;
+	// current selections
 	private HashMap<String, String> selections = new HashMap<String, String>();
 
 	// Control variable for central cube creation
@@ -110,8 +112,8 @@ public class GUI {
 			}
 		});
 		// Remove selection from list
-		removeBtn = new JButton("Clear selected list");
-		removeBtn.addActionListener(new ActionListener() {
+		clearBtn = new JButton("Clear selected list");
+		clearBtn.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -123,10 +125,11 @@ public class GUI {
 		goBtn = new JButton("Execute query");
 		goBtn.addActionListener(new ActionListener() {
 
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb;
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				sb = new StringBuilder();
 				Iterator iter = selections.entrySet().iterator();
 				sb.append("SELECT ");
 				while (iter.hasNext()) {
@@ -161,6 +164,16 @@ public class GUI {
 				}
 			}
 		});
+		
+		removeBtn = new JButton("Remove attribute");
+		removeBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				selections.remove(dimensionList.getSelectedValue());
+				selectModel.removeElement(dimensionList.getSelectedValue().toString() + "." + attrList.getSelectedValue().toString());
+			}
+		});
 
 		// CONFIG LEFT PANEL
 		leftPanel.add(dimPane);
@@ -177,6 +190,7 @@ public class GUI {
 		centerPanel = new JPanel(new GridLayout(1, 4));
 		centerPanel.add(selectBtn);
 		centerPanel.add(removeBtn);
+		centerPanel.add(clearBtn);
 		centerPanel.add(goBtn);
 
 		// CUBE PANEL *************************
