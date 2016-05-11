@@ -41,9 +41,7 @@ public class GUI {
 	private ArrayList<String> attributes;
 	// current selections
 	private HashMap<String, String> selections = new HashMap<String, String>();
-
-	// Control variable for central cube creation
-	private Boolean firstLoad = true;
+	private HashMap<String, String> userInputHash = new HashMap<String, String>();
 
 	public static void main(String[] args) throws SQLException {
 		// Instantiate SQLEngine
@@ -107,6 +105,12 @@ public class GUI {
 			public void actionPerformed(ActionEvent e) {
 				String tempDim = dimensionList.getSelectedValue().toString();
 				String tempAttr = attrList.getSelectedValue().toString();
+				String tempUserInput = "";
+				if(!userEntry.getText().isEmpty()) {
+					tempUserInput = userEntry.getText();
+					userInputHash.put(tempDim + "." + tempAttr, tempUserInput);
+					System.out.println(tempDim + "." + tempAttr + " = " + tempUserInput);
+				}
 				selections.put(dimensionList.getSelectedValue().toString(), attrList.getSelectedValue().toString());
 				selectModel.addElement(tempDim + "." + tempAttr);
 			}
@@ -143,11 +147,21 @@ public class GUI {
 				sb.append(" FROM store, product, time, sales_fact");
 				sb.append(" WHERE time.year = 1994 AND store.store_key = sales_fact.store_key AND");
 				sb.append(" product.product_key = sales_fact.product_key AND time.time_key = sales_fact.time_key");
+
+				// Check for user input
+				Iterator iter1 = userInputHash.entrySet().iterator();
+				while (iter1.hasNext()) {
+					sb.append(" AND ");
+					Map.Entry pair = (Map.Entry) iter1.next();
+					sb.append(pair.getKey() + " = '" + pair.getValue() +"'");
+				}
+
+				// Run through group by
 				Iterator iter2 = selections.entrySet().iterator();
 				sb.append(" GROUP BY ");
 				while (iter2.hasNext()) {
 					Map.Entry pair = (Map.Entry) iter2.next();
-					sb.append(pair.getKey() + "." + pair.getValue() + ", ");
+					sb.append(pair.getKey() + " . " + pair.getValue() + ", ");
 				}
 				String finalSql = sb.toString().substring(0, sb.lastIndexOf(","));
 				try {
@@ -158,20 +172,21 @@ public class GUI {
 					cubePane = new JScrollPane(cube);
 					cubePanel.add(cubePane);
 					cubePanel.validate();
-					
+
 				} catch (SQLException e1) {
 					e1.printStackTrace();
 				}
 			}
 		});
-		
+
 		removeBtn = new JButton("Remove attribute");
 		removeBtn.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				selections.remove(dimensionList.getSelectedValue());
-				selectModel.removeElement(dimensionList.getSelectedValue().toString() + "." + attrList.getSelectedValue().toString());
+				selectModel.removeElement(
+						dimensionList.getSelectedValue().toString() + "." + attrList.getSelectedValue().toString());
 			}
 		});
 
